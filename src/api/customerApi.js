@@ -78,28 +78,28 @@ searchMedicines: async (params) => {
     return response.data;
   },
 
-  // // Upload prescription
-  // uploadPrescription: async (orderId, prescriptionFile) => {
-  //   const formData = new FormData();
-  //   formData.append('prescription', prescriptionFile);
-    
-  //   const response = await axiosInstance.put(
-  //     `${ORDER_URL}/verify-prescription/${orderId}`,
-  //     formData,
-  //     {
-  //       headers: {
-  //         'Content-Type': 'multipart/form-data',
-  //       },
-  //     }
-  //   );
-  //   return response.data;
-  // },
+
 
   // Verify payment
   verifyPayment: async (paymentData) => {
     const response = await axiosInstance.post(
       `${ORDER_URL}/verify-payment`,
       paymentData
+    );
+    return response.data;
+  },
+
+  // Get nearest pharmacies
+  getNearestPharmacies: async (params) => {
+    const { latitude, longitude, radius = 10 } = params;
+    
+    const response = await axiosInstance.post(
+      `${PHARMACY_URL}/nearest`,
+      {
+        latitude,
+        longitude,
+        radius
+      }
     );
     return response.data;
   },

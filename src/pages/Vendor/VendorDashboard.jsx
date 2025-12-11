@@ -64,12 +64,14 @@ const VendorDashboard = () => {
           <Card>
             <div className="text-center py-12">
               <div className="text-red-500 text-6xl mb-4">⚠️</div>
-              <h3 className="text-xl font-bold text-gray-800 mb-2">Backend Error</h3>
               <p className="text-gray-600 mb-4">{error}</p>
-              <p className="text-sm text-gray-500 mb-4">
-                This is a backend authentication issue. Please check your backend logs.
-              </p>
-              <Button onClick={() => window.location.reload()}>Retry</Button>
+              <div className="flex justify-between items-center mb-6">
+          <h1 className="text-3xl font-bold text-gray-800">Vendor Dashboard</h1>
+          <Button onClick={() => navigate('/vendor/register-pharmacy')} className="flex items-center gap-2">
+            <FaPlus />
+            Register New Pharmacy
+          </Button>
+        </div>
             </div>
           </Card>
         </div>

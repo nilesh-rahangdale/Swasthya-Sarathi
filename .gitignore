@@ -40,6 +40,12 @@ coverage
 .env.production
 .env.development
 .env.test
+.env.admin
+
+# Admin access files (CONFIDENTIAL)
+ADMIN_ACCESS.md
+ADMIN_REGISTRATION.md
+.admin-*
 
 # OS files
 Thumbs.db

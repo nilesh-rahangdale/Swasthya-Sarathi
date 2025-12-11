@@ -10,6 +10,7 @@ import RoleBasedRoute from './RoleBasedRoute';
 // Auth Pages
 const Login = lazy(() => import('../pages/Auth/Login'));
 const Signup = lazy(() => import('../pages/Auth/Signup'));
+const ProfileSelection = lazy(() => import('../pages/Auth/ProfileSelection'));
 const ForgotPassword = lazy(() => import('../pages/Auth/ForgotPassword'));
 
 // Customer Pages
@@ -70,7 +71,8 @@ const AppRoutes = () => {
 
         {/* Auth Routes */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={getHomeRoute()} replace />} />
-        <Route path="/signup" element={!isAuthenticated ? <Signup /> : <Navigate to={getHomeRoute()} replace />} />
+        <Route path="/signup" element={!isAuthenticated ? <ProfileSelection /> : <Navigate to={getHomeRoute()} replace />} />
+        <Route path="/signup/:profileType" element={!isAuthenticated ? <Signup /> : <Navigate to={getHomeRoute()} replace />} />
         <Route path="/forgot-password" element={<ForgotPassword />} />
 
         {/* Customer Routes */}

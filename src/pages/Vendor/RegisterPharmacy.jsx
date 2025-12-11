@@ -7,6 +7,7 @@ import Input from '../../components/ui/Input';
 import Card from '../../components/ui/Card';
 import { FiMapPin, FiPhone, FiFileText } from 'react-icons/fi';
 import { getCurrentLocation } from '../../utils/location';
+import toast from 'react-hot-toast';
 
 const RegisterPharmacy = () => {
   const [formData, setFormData] = useState({
@@ -39,7 +40,7 @@ const RegisterPharmacy = () => {
         longitude: location.longitude,
       });
     } catch (error) {
-      alert(error.message);
+      console.log(error)
     }
   };
 

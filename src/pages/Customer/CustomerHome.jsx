@@ -1,11 +1,64 @@
 import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaPills, FaStethoscope, FaShoppingCart, FaTruck, FaRobot } from 'react-icons/fa';
+import { useEffect, useState } from 'react';
+import { FaSearch, FaPills, FaStethoscope, FaShoppingCart, FaTruck, FaRobot, FaMapMarkerAlt, FaPhone, FaUser } from 'react-icons/fa';
 import Layout from '../../components/layouts/Layout';
 import Card from '../../components/ui/Card';
 import Button from '../../components/ui/Button';
+import Loader from '../../components/common/Loader';
+import { customerApi } from '../../api/customerApi';
+import toast from 'react-hot-toast';
 
 const CustomerHome = () => {
   const navigate = useNavigate();
+  const [nearbyPharmacies, setNearbyPharmacies] = useState([]);
+  const [loadingPharmacies, setLoadingPharmacies] = useState(false);
+  const [userLocation, setUserLocation] = useState(null);
+  const [locationError, setLocationError] = useState(null);
+
+  // Fetch user's current location
+  useEffect(() => {
+    if (navigator.geolocation) {
+      setLoadingPharmacies(true);
+      navigator.geolocation.getCurrentPosition(
+        (position) => {
+          const location = {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          };
+          setUserLocation(location);
+          fetchNearbyPharmacies(location);
+        },
+        (error) => {
+          console.error('Error getting location:', error);
+          setLocationError('Unable to get your location. Please enable location services.');
+          setLoadingPharmacies(false);
+        }
+      );
+    } else {
+      setLocationError('Geolocation is not supported by your browser.');
+    }
+  }, []);
+
+  // Fetch nearby pharmacies
+  const fetchNearbyPharmacies = async (location) => {
+    try {
+      setLoadingPharmacies(true);
+      const response = await customerApi.getNearestPharmacies({
+        latitude: location.latitude,
+        longitude: location.longitude,
+        radius: 10, // 10 km radius
+      });
+      
+      if (response.success) {
+        setNearbyPharmacies(response.pharmacies || []);
+      }
+    } catch (error) {
+      console.error('Error fetching nearby pharmacies:', error);
+      toast.error('Failed to load nearby pharmacies');
+    } finally {
+      setLoadingPharmacies(false);
+    }
+  };
 
   const features = [
     {
@@ -86,6 +139,109 @@ const CustomerHome = () => {
               </p>
             </div>
           </div>
+        </Card>
+
+        {/* Nearby Pharmacies Section */}
+        <Card className="mb-8">
+          <div className="flex items-center justify-between mb-6">
+            <div className="flex items-center gap-3">
+              <FaMapMarkerAlt className="text-2xl text-blue-600" />
+              <h2 className="text-2xl font-bold text-gray-800">
+                Nearby Pharmacies
+              </h2>
+            </div>
+            {nearbyPharmacies.length > 0 && (
+              <span className="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-semibold">
+                {nearbyPharmacies.length} Found
+              </span>
+            )}
+          </div>
+
+          {loadingPharmacies ? (
+            <div className="py-12">
+              <Loader />
+            </div>
+          ) : locationError ? (
+            <div className="text-center py-8">
+              <FaMapMarkerAlt className="mx-auto text-5xl text-gray-300 mb-4" />
+              <p className="text-gray-600 mb-4">{locationError}</p>
+              <Button
+                size="sm"
+                onClick={() => window.location.reload()}
+              >
+                Try Again
+              </Button>
+            </div>
+          ) : nearbyPharmacies.length === 0 ? (
+            <div className="text-center py-8">
+              <FaMapMarkerAlt className="mx-auto text-5xl text-gray-300 mb-4" />
+              <p className="text-gray-600">No pharmacies found nearby</p>
+              <p className="text-sm text-gray-500 mt-2">Try searching for medicines instead</p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+              {nearbyPharmacies.slice(0, 6).map((pharmacy) => (
+                <div
+                  key={pharmacy.pharmacyId}
+                  className="border border-gray-200 rounded-lg p-4 hover:shadow-md transition-shadow cursor-pointer"
+                  onClick={() => navigate(`/customer/search?pharmacyId=${pharmacy.pharmacyId}`)}
+                >
+                  <div className="flex items-start justify-between mb-3">
+                    <h3 className="font-bold text-gray-800 text-lg">
+                      {pharmacy.pharmacyName}
+                    </h3>
+                    <span className="px-2 py-1 bg-green-100 text-green-800 rounded-full text-xs font-semibold">
+                      {pharmacy.distance} km
+                    </span>
+                  </div>
+
+                  <div className="space-y-2 text-sm text-gray-600">
+                    <div className="flex items-start gap-2">
+                      <FaMapMarkerAlt className="text-gray-400 mt-1 flex-shrink-0" />
+                      <p className="line-clamp-2">{pharmacy.address}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <FaPhone className="text-gray-400 flex-shrink-0" />
+                      <p>{pharmacy.contactNumber}</p>
+                    </div>
+
+                    <div className="flex items-center gap-2">
+                      <FaUser className="text-gray-400 flex-shrink-0" />
+                      <p>{pharmacy.owner.name}</p>
+                    </div>
+
+                    <div className="pt-2 border-t border-gray-100 flex justify-between items-center">
+                      <span className="text-xs text-gray-500">
+                        {pharmacy.availableMedicines} medicines available
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          navigate(`/customer/search?pharmacyId=${pharmacy.pharmacyId}`);
+                        }}
+                      >
+                        View →
+                      </Button>
+                    </div>
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          {nearbyPharmacies.length > 6 && (
+            <div className="mt-6 text-center">
+              <Button
+                variant="outline"
+                onClick={() => navigate('/customer/search')}
+              >
+                View All Pharmacies
+              </Button>
+            </div>
+          )}
         </Card>
 
         {/* Features Grid */}

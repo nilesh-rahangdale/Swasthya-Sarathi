@@ -72,6 +72,12 @@ const PharmacySales = () => {
               </option>
             ))}
           </select>
+          {approvedPharmacies.length === 0 && (
+            <p className="text-sm text-amber-600 mt-2 flex items-center gap-2">
+              <FiDollarSign className="flex-shrink-0" />
+              No approved pharmacies found. Please register and get approval for a pharmacy first.
+            </p>
+          )}
         </Card>
 
         {loading ? (
