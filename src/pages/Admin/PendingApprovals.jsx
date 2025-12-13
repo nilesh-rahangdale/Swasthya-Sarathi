@@ -90,7 +90,8 @@ const PendingApprovals = () => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-800">{pharmacy.name}</h3>
-            <p className="text-sm text-gray-600">Vendor: {pharmacy.vendor?.firstName} {pharmacy.vendor?.lastName}</p>
+            <p className="text-sm text-gray-600">Owner: {pharmacy.owner?.firstName} {pharmacy.owner?.lastName}</p>
+            <p className="text-xs text-gray-500">{pharmacy.owner?.email}</p>
           </div>
         </div>
         <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
@@ -113,18 +114,24 @@ const PendingApprovals = () => {
           <p className="text-gray-600 text-sm">Address</p>
           <p className="font-medium text-gray-800 text-sm">{pharmacy.address}</p>
         </div>
-        <div>
-          <p className="text-gray-600 text-sm">Contact</p>
-          <p className="font-medium text-gray-800 text-sm">{pharmacy.contactNumber}</p>
+        <div className="grid grid-cols-2 gap-4 text-sm">
+          <div>
+            <p className="text-gray-600">Owner Contact</p>
+            <p className="font-medium text-gray-800">{pharmacy.owner?.contactNumber}</p>
+          </div>
+          <div>
+            <p className="text-gray-600">Pharmacy Contact</p>
+            <p className="font-medium text-gray-800">{pharmacy.contactNumber}</p>
+          </div>
         </div>
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-600">Latitude</p>
-            <p className="font-medium text-gray-800">{pharmacy.location?.coordinates[1]}</p>
+            <p className="font-medium text-gray-800">{pharmacy.coordinates?.latitude || 'N/A'}</p>
           </div>
           <div>
             <p className="text-gray-600">Longitude</p>
-            <p className="font-medium text-gray-800">{pharmacy.location?.coordinates[0]}</p>
+            <p className="font-medium text-gray-800">{pharmacy.coordinates?.longitude || 'N/A'}</p>
           </div>
         </div>
       </div>
@@ -158,9 +165,9 @@ const PendingApprovals = () => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-800">
-              {volunteer.firstName} {volunteer.lastName}
+              {volunteer.user?.firstName} {volunteer.user?.lastName}
             </h3>
-            <p className="text-sm text-gray-600">{volunteer.email}</p>
+            <p className="text-sm text-gray-600">{volunteer.user?.email}</p>
           </div>
         </div>
         <span className="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-xs font-medium">
@@ -172,7 +179,7 @@ const PendingApprovals = () => {
         <div className="grid grid-cols-2 gap-4 text-sm">
           <div>
             <p className="text-gray-600">Contact</p>
-            <p className="font-medium text-gray-800">{volunteer.contactNumber}</p>
+            <p className="font-medium text-gray-800">{volunteer.user?.contactNumber}</p>
           </div>
           <div>
             <p className="text-gray-600">Age</p>

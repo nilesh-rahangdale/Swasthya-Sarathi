@@ -4,7 +4,6 @@ import { useSelector } from 'react-redux';
 // Lazy load pages
 import { lazy, Suspense } from 'react';
 import Loader from '../components/common/Loader';
-import ProtectedRoute from './ProtectedRoute';
 import RoleBasedRoute from './RoleBasedRoute';
 
 // Auth Pages
@@ -22,9 +21,11 @@ const MyOrders = lazy(() => import('../pages/Customer/MyOrders'));
 const TrackOrder = lazy(() => import('../pages/Customer/TrackOrder'));
 const MedicineInfo = lazy(() => import('../pages/Customer/MedicineInfo'));
 const SymptomChecker = lazy(() => import('../pages/Customer/SymptomChecker'));
+const AIAssistant = lazy(() => import('../pages/Customer/AIAssistant'));
 
 // Vendor Pages
 const VendorDashboard = lazy(() => import('../pages/Vendor/VendorDashboard'));
+const PharmacyDashboard = lazy(() => import('../pages/Vendor/PharmacyDashboard'));
 const RegisterPharmacy = lazy(() => import('../pages/Vendor/RegisterPharmacy'));
 const ManageInventory = lazy(() => import('../pages/Vendor/ManageInventory'));
 const VendorOrders = lazy(() => import('../pages/Vendor/VendorOrders'));
@@ -42,12 +43,15 @@ const PendingApprovals = lazy(() => import('../pages/Admin/PendingApprovals'));
 const ManagePharmacies = lazy(() => import('../pages/Admin/ManagePharmacies'));
 const ManageVolunteers = lazy(() => import('../pages/Admin/ManageVolunteers'));
 
+// Landing Page
+const LandingPage = lazy(() => import('../pages/LandingPage'));
+
 const AppRoutes = () => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   // Redirect to role-specific home if authenticated
   const getHomeRoute = () => {
-    if (!isAuthenticated) return '/login';
+    if (!isAuthenticated) return '/';
     
     switch (user?.accountType) {
       case 'Customer':
@@ -59,15 +63,18 @@ const AppRoutes = () => {
       case 'Admin':
         return '/admin/dashboard';
       default:
-        return '/login';
+        return '/';
     }
   };
 
   return (
     <Suspense fallback={<Loader />}>
       <Routes>
-        {/* Root Route */}
-        <Route path="/" element={<Navigate to={getHomeRoute()} replace />} />
+        {/* Root Route - Landing Page for unauthenticated, redirect to home for authenticated */}
+        <Route 
+          path="/" 
+          element={!isAuthenticated ? <LandingPage /> : <Navigate to={getHomeRoute()} replace />} 
+        />
 
         {/* Auth Routes */}
         <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to={getHomeRoute()} replace />} />
@@ -140,6 +147,14 @@ const AppRoutes = () => {
             </RoleBasedRoute>
           }
         />
+        <Route
+          path="/customer/ai-assistant"
+          element={
+            <RoleBasedRoute allowedRoles={['Customer']}>
+              <AIAssistant />
+            </RoleBasedRoute>
+          }
+        />
 
         {/* Vendor Routes */}
         <Route
@@ -147,6 +162,14 @@ const AppRoutes = () => {
           element={
             <RoleBasedRoute allowedRoles={['Vendor']}>
               <VendorDashboard />
+            </RoleBasedRoute>
+          }
+        />
+        <Route
+          path="/vendor/pharmacy/:pharmacyId/dashboard"
+          element={
+            <RoleBasedRoute allowedRoles={['Vendor']}>
+              <PharmacyDashboard />
             </RoleBasedRoute>
           }
         />

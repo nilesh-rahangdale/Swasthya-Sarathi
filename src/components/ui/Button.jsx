@@ -15,13 +15,48 @@ const Button = ({
   const baseStyles = 'font-medium rounded-lg transition-all duration-200 flex items-center justify-center gap-2 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
   
   const variants = {
-    primary: 'bg-primary-600 text-white hover:bg-primary-700 focus:ring-primary-500',
-    secondary: 'bg-gray-200 text-gray-800 hover:bg-gray-300 focus:ring-gray-400',
-    success: 'bg-success-600 text-white hover:bg-success-700 focus:ring-success-500',
-    danger: 'bg-danger-600 text-white hover:bg-danger-700 focus:ring-danger-500',
-    outline: 'border-2 border-primary-600 text-primary-600 hover:bg-primary-50 focus:ring-primary-500',
-    ghost: 'text-gray-700 hover:bg-gray-100 focus:ring-gray-400',
-  };
+  primary:
+    "bg-primary-600 text-white hover:bg-primary-700 active:bg-primary-800 " +
+    "focus:ring-4 focus:ring-primary-300 shadow-md hover:shadow-lg " +
+    "transition-all rounded-xl",
+
+  secondary:
+    "bg-gray-100 text-gray-800 hover:bg-gray-200 active:bg-gray-300 " +
+    "focus:ring-4 focus:ring-gray-300 rounded-xl transition",
+
+  success:
+    "bg-emerald-600 text-white hover:bg-emerald-700 active:bg-emerald-800 " +
+    "focus:ring-4 focus:ring-emerald-300 shadow-md hover:shadow-lg rounded-xl transition",
+
+  danger:
+    "bg-red-600 text-white hover:bg-red-700 active:bg-red-800 " +
+    "focus:ring-4 focus:ring-red-300 shadow-md hover:shadow-lg rounded-xl transition",
+
+  outline:
+    "border border-primary-600 text-primary-600 hover:bg-primary-50 active:bg-primary-100 " +
+    "focus:ring-4 focus:ring-primary-200 rounded-xl transition",
+
+  ghost:
+    "text-gray-700 hover:bg-gray-100 active:bg-gray-200 " +
+    "focus:ring-4 focus:ring-gray-300 rounded-xl transition",
+
+  link:
+    "text-primary-600 hover:text-primary-700 active:text-primary-800 " +
+    "underline-offset-2 hover:underline transition",
+
+  subtle:
+    "bg-primary-50 text-primary-700 hover:bg-primary-100 active:bg-primary-200 " +
+    "focus:ring-4 focus:ring-primary-200 rounded-xl transition",
+
+  soft:
+    "bg-gray-50 text-gray-800 hover:bg-gray-100 active:bg-gray-200 " +
+    "shadow-sm rounded-xl transition",
+
+  pill:
+    "bg-primary-600 text-white px-6 py-2 rounded-full shadow hover:bg-primary-700 " +
+    "active:bg-primary-800 focus:ring-4 focus:ring-primary-300 transition",
+};
+
   
   const sizes = {
     sm: 'px-3 py-1.5 text-sm',

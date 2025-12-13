@@ -20,7 +20,10 @@ const AvailableOrders = () => {
   const handleAcceptOrder = async (orderId) => {
     const result = await dispatch(acceptOrder(orderId));
     if (!result.error) {
+      // Refresh available orders list after accepting
       dispatch(getAvailableOrders());
+      // Note: We don't refresh profile here to avoid resetting availability status
+      // The volunteer should remain available to accept more orders
     }
   };
 

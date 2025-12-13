@@ -1,28 +1,55 @@
 import { useState, useEffect } from 'react';
 import { useDispatch, useSelector } from 'react-redux';
-import { useNavigate } from 'react-router-dom';
-import { FaSearch, FaMapMarkerAlt, FaShoppingCart } from 'react-icons/fa';
+import { useNavigate, useLocation } from 'react-router-dom';
+import { motion, AnimatePresence } from 'framer-motion';
+import { FaSearch, FaMapMarkerAlt, FaShoppingCart, FaPhoneAlt, FaUser, FaStore, FaPills, FaCheckCircle, FaTimesCircle, FaFilter, FaSortAmountDown } from 'react-icons/fa';
 import Layout from '../../components/layouts/Layout';
-import Button from '../../components/ui/Button';
-import Input from '../../components/ui/Input';
-import Card from '../../components/ui/Card';
 import Loader from '../../components/common/Loader';
 import { searchMedicines, setUserLocation } from '../../redux/slices/customerSlice';
 import { getCurrentLocation } from '../../utils/location';
 import { formatCurrency } from '../../utils/formatters';
+import ProductCard from '../../components/ui/ProductCard';
 
 const SearchMedicine = () => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const location = useLocation();
   const { searchResults, searchMetadata, userLocation, loading } = useSelector(state => state.customer);
 
   const [searchQuery, setSearchQuery] = useState('');
-  const [radius, setRadius] = useState(3); // 3km default
+  const [radius, setRadius] = useState(5); // 5km default
   const [cart, setCart] = useState({});
+  const [sortBy, setSortBy] = useState('distance'); // distance, price
+  const [filterAvailable, setFilterAvailable] = useState(false);
 
   useEffect(() => {
-    // Get user location on mount
-    if (!userLocation) {
+    // Check if location data passed from navbar
+    if (location.state) {
+      const { latitude, longitude, radius: navRadius, medicineName } = location.state;
+      
+      if (latitude && longitude) {
+        dispatch(setUserLocation({ latitude, longitude }));
+        if (navRadius) setRadius(navRadius);
+        if (medicineName) {
+          setSearchQuery(medicineName);
+          // Auto-search if all params are provided
+          dispatch(searchMedicines({
+            latitude,
+            longitude,
+            radius: navRadius || 5,
+            medicineName,
+          }));
+        }
+      }
+    } else if (!userLocation) {
+      // Automatically get user location on mount
+      handleGetLocation();
+    }
+  }, [location.state]);
+
+  // Auto-set location on component mount for search readiness
+  useEffect(() => {
+    if (!userLocation && !location.state) {
       handleGetLocation();
     }
   }, []);
@@ -96,6 +123,31 @@ const SearchMedicine = () => {
     return Object.values(cart).reduce((sum, item) => sum + item.quantity, 0);
   };
 
+  // Sort and filter results
+  const getSortedAndFilteredResults = () => {
+    let results = [...searchResults];
+    
+    // Filter by availability
+    if (filterAvailable) {
+      results = results.filter(item => item.isAvailable);
+    }
+    
+    // Sort
+    if (sortBy === 'distance') {
+      results.sort((a, b) => {
+        const distA = parseFloat(a.distance);
+        const distB = parseFloat(b.distance);
+        return distA - distB;
+      });
+    } else if (sortBy === 'price') {
+      results.sort((a, b) => a.price - b.price);
+    }
+    
+    return results;
+  };
+
+  const filteredResults = getSortedAndFilteredResults();
+
   const handleProceedToCheckout = () => {
     // Group cart items by pharmacy
     const ordersByPharmacy = {};
@@ -125,172 +177,147 @@ const SearchMedicine = () => {
 
   return (
     <Layout>
-      <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 sm:py-12 mb-6">
         {/* Header */}
-        <div className="flex justify-between items-center mb-6">
-          <h1 className="text-3xl font-bold text-gray-800">Search Medicine</h1>
-          {getTotalItems() > 0 && (
-            <Button onClick={handleProceedToCheckout} className="flex items-center gap-2">
-              <FaShoppingCart />
-              Proceed to Checkout ({getTotalItems()} items)
-            </Button>
-          )}
-        </div>
-
-        {/* Location Info */}
-        <Card className="mb-6">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center gap-2">
-              <FaMapMarkerAlt className="text-blue-600" />
-              <span className="text-gray-700">
-                {userLocation
-                  ? `Searching within ${radius }km of your location`
-                  : 'Location not detected'}
-              </span>
-            </div>
-            <Button variant="outline" size="sm" onClick={handleGetLocation}>
-              {userLocation ? 'Update Location' : 'Get Location'}
-            </Button>
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-18"
+        >
+          <div className="mb-6">
+            <h1 className="text-3xl sm:text-4xl font-bold text-textc-dark mb-2">
+              Search Medicines
+            </h1>
+            <p className="text-textc-base">Find medicines from nearby pharmacies</p>
           </div>
-        </Card>
-
-        {/* Search Form */}
-        <Card className="mb-6">
-          <form onSubmit={handleSearch} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-              <div className="md:col-span-2">
-                <Input
-                  label="Medicine Name"
-                  placeholder="Enter medicine name..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                  required
-                />
-              </div>
-              <div>
-                <label className="block text-sm font-medium text-gray-700 mb-1">
-                  Search Radius
-                </label>
-                <select
-                  value={radius}
-                  onChange={(e) => setRadius(Number(e.target.value))}
-                  className="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-                >
-                  <option value={2}>2 km</option>
-                  <option value={3}>3 km</option>
-                  <option value={5}>5 km</option>
-                  <option value={10}>10 km</option>
-                  <option value={20}>20 km</option>
-                </select>
-              </div>
-            </div>
-            <Button type="submit" disabled={loading || !userLocation} className="flex items-center gap-2">
-              <FaSearch />
-              Search
-            </Button>
-          </form>
-        </Card>
+          
+          {getTotalItems() > 0 && (
+            <motion.button
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              onClick={handleProceedToCheckout}
+              className="px-6 py-3 text-gray-800 border-2 border-gray-400 font-semibold rounded-full hover:shadow-lg transition-all duration-200 flex items-center gap-2"
+            >
+              <FaShoppingCart />
+              Checkout ({getTotalItems()})
+            </motion.button>
+          )}
+        </motion.div>
 
         {/* Results */}
         {loading ? (
-          <Loader />
-        ) : searchResults.length > 0 ? (
-          <div className="space-y-6">
-            {searchMetadata && (
-              <div className="bg-blue-50 p-4 rounded-lg">
-                <p className="text-sm text-blue-800">
-                  {searchMetadata.message}
-                </p>
-              </div>
-            )}
-            {searchResults.map((pharmacy, idx) => {
-              const cartQty = getCartQuantity(pharmacy);
-              return (
-                <Card key={`${pharmacy.pharmacyId}-${idx}`}>
-                  <div className="mb-4 border-b pb-4">
-                    <h3 className="text-xl font-bold text-gray-800">{pharmacy.pharmacyName}</h3>
-                    <p className="text-gray-600 text-sm">{pharmacy.address}</p>
-                    <p className="text-gray-500 text-sm">
-                      📍 {pharmacy.distance}
-                    </p>
-                    <p className="text-gray-600 text-sm">👤 {pharmacy.ownerName}</p>
-                    <p className="text-gray-600 text-sm">📞 {pharmacy.ownerContact}</p>
-                  </div>
-
-                  {/* Medicine Details */}
-                  <div className="space-y-3">
-                    <div className="flex items-center justify-between p-3 bg-gray-50 rounded-lg gap-4">
-                      {/* Medicine Image */}
-                      {pharmacy.medicineImage && (
-                        <img
-                          src={pharmacy.medicineImage}
-                          alt={pharmacy.medicineName}
-                          className="w-20 h-20 object-cover rounded-lg border border-gray-200"
-                          onError={(e) => {
-                            e.target.style.display = 'none';
-                          }}
-                        />
-                      )}
-                      
-                      {/* Medicine Info */}
-                      <div className="flex-1">
-                        <p className="font-medium text-gray-800">{pharmacy.medicineName}</p>
-                        <p className="text-sm text-gray-600">
-                          Price: {formatCurrency(pharmacy.price)}
-                        </p>
-                        <p className="text-sm text-gray-500">
-                          Stock: {pharmacy.stock} units
-                        </p>
-                        <p className={`text-sm font-medium ${pharmacy.isAvailable ? 'text-green-600' : 'text-red-600'}`}>
-                          {pharmacy.isAvailable ? '✓ In Stock' : '✗ Out of Stock'}
-                        </p>
-                      </div>
-                      
-                      {/* Cart Actions */}
-                      <div className="flex items-center gap-2">
-                        {cartQty > 0 ? (
-                          <div className="flex items-center gap-2">
-                            <Button
-                              size="sm"
-                              variant="outline"
-                              onClick={() => handleRemoveFromCart(pharmacy)}
-                            >
-                              -
-                            </Button>
-                            <span className="font-medium w-8 text-center">{cartQty}</span>
-                            <Button
-                              size="sm"
-                              onClick={() => handleAddToCart(pharmacy)}
-                              disabled={!pharmacy.isAvailable}
-                            >
-                              +
-                            </Button>
-                          </div>
-                        ) : (
-                          <Button
-                            size="sm"
-                            onClick={() => handleAddToCart(pharmacy)}
-                            disabled={!pharmacy.isAvailable}
-                          >
-                            <FaShoppingCart className="mr-1" />
-                            Add to Cart
-                          </Button>
-                        )}
-                      </div>
-                    </div>
-                  </div>
-                </Card>
-              );
-            })}
+          <div className="py-20">
+            <Loader />
+            <p className="text-center text-textc-base mt-4">Searching nearby pharmacies...</p>
           </div>
-        ) : (
-          <Card>
-            <p className="text-gray-500 text-center py-8">
-              {searchQuery
-                ? 'No medicines found. Try adjusting your search or radius.'
-                : 'Enter a medicine name to search nearby pharmacies.'}
+        ) : filteredResults.length > 0 ? (
+          <div className="space-y-6">
+            {/* Results Header with Sort & Filter */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+              className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 bg-white rounded-2xl shadow-card p-4 mb-20"
+            >
+              <div className="flex items-center gap-3">
+                <FaPills className="text-2xl text-primary" />
+                <div>
+                  <p className="font-bold text-textc-dark">
+                    {filteredResults.length} Result{filteredResults.length !== 1 ? 's' : ''} Found
+                  </p>
+                  {searchMetadata && (
+                    <p className="text-sm text-textc-base">{searchMetadata.message}</p>
+                  )}
+                </div>
+              </div>
+
+              <div className="flex flex-wrap items-center gap-3">
+                {/* Filter Toggle */}
+                <button
+                  onClick={() => setFilterAvailable(!filterAvailable)}
+                  className={`px-4 py-2 rounded-xl font-medium text-sm transition-all duration-200 flex items-center gap-2 ${
+                    filterAvailable
+                      ? 'bg-primary text-textc-dark shadow-md'
+                      : 'bg-gray-100 text-textc-base hover:bg-gray-200'
+                  }`}
+                >
+                  <FaFilter />
+                  Available Only
+                </button>
+
+                {/* Sort Dropdown */}
+                <div className="flex items-center gap-2">
+                  <FaSortAmountDown className="text-textc-base" />
+                  <select
+                    value={sortBy}
+                    onChange={(e) => setSortBy(e.target.value)}
+                    className="px-4 py-2 bg-gray-100 text-textc-base rounded-xl font-medium text-sm border-none focus:outline-none focus:ring-2 focus:ring-primary"
+                  >
+                    <option value="distance">Sort by Distance</option>
+                    <option value="price">Sort by Price</option>
+                  </select>
+                </div>
+              </div>
+            </motion.div>
+
+            {/* Medicine Cards - Modern E-commerce Grid */}
+            <div className="grid grid-cols-1 lg:grid-cols-2   gap-10">
+              <AnimatePresence>
+                {filteredResults.map((pharmacy, idx) => {
+                  const cartQty = getCartQuantity(pharmacy);
+                  return (
+                    <ProductCard
+                key={`${pharmacy.pharmacyId}-${idx}`}
+                pharmacy={pharmacy}
+                index={idx}
+                cartQty={getCartQuantity(pharmacy)}
+                onAddToCart={handleAddToCart}
+                onRemoveFromCart={handleRemoveFromCart}
+                formatCurrency={formatCurrency}
+              />
+                  );
+                })}
+              </AnimatePresence>
+            </div>
+          </div>
+        ) : searchQuery ? (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white rounded-2xl shadow-card p-12 text-center"
+          >
+            <div className="inline-flex p-6 bg-gray-50 rounded-full mb-4">
+              <FaSearch className="text-5xl text-gray-300" />
+            </div>
+            <h3 className="text-xl font-bold text-textc-dark mb-2">No Results Found</h3>
+            <p className="text-textc-base mb-6">
+              No medicines found matching "{searchQuery}". Try adjusting your search or radius.
             </p>
-          </Card>
+            <button
+              onClick={() => {
+                setSearchQuery('');
+                setFilterAvailable(false);
+              }}
+              className="px-6 py-3 bg-primary text-textc-dark font-medium rounded-xl hover:bg-primary-dark transition-all duration-200"
+            >
+              Clear Search
+            </button>
+          </motion.div>
+        ) : (
+          <motion.div
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="bg-white rounded-2xl shadow-card p-12 text-center"
+          >
+            <div className="inline-flex p-6 bg-primary-light rounded-full mb-4">
+              <FaPills className="text-5xl text-primary" />
+            </div>
+            <h3 className="text-xl font-bold text-textc-dark mb-2">Start Searching</h3>
+            <p className="text-textc-base">
+              Enter a medicine name above to find available pharmacies near you.
+            </p>
+          </motion.div>
         )}
       </div>
     </Layout>

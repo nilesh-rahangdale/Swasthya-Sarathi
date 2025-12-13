@@ -41,4 +41,8 @@
   .scrollbar-hide::-webkit-scrollbar {
     display: none;
   }
+
+  .animate-scroll-horizontal:hover {
+    animation-play-state: paused;
+  }
 }

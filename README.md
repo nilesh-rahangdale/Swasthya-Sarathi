@@ -37,12 +37,14 @@
 <td>
 
 ### 🏥 For Vendors
-- 📦 **Inventory Management** - Add and update medicines
-- 📊 **Sales Dashboard** - Track sales and revenue
+- 📦 **Inventory Management** - Add and update medicines with profit margins
+- 📊 **Sales Dashboard** - Track sales, revenue, and net profit
+- 🏪 **Pharmacy-Specific Dashboards** - Individual pharmacy performance metrics
 - 🔔 **Order Notifications** - Real-time order alerts
 - ✅ **Order Processing** - Confirm, prepare, and fulfill orders
 - 🧾 **Prescription Verification** - Approve/reject prescriptions
-- 📈 **Analytics** - View business insights
+- 📈 **Advanced Analytics** - Total orders, completed orders, medicines sold
+- 🔍 **Inventory Search** - Quick search and filter capabilities
 
 </td>
 </tr>
@@ -111,6 +113,7 @@
 - 💰 **Razorpay** - Payment gateway integration
 - 🔥 **React Hot Toast** - Beautiful notifications
 - 🎭 **React Icons** - Comprehensive icon library
+- 🎬 **Framer Motion** - Smooth animations and transitions
 
 ## 📁 Project Structure
 
@@ -139,7 +142,8 @@ src/
 │   ├── ui/
 │   │   ├── Button.jsx
 │   │   ├── Input.jsx
-│   │   └── Card.jsx
+│   │   ├── Card.jsx
+│   │   └── ProductCard.jsx
 │   └── layouts/
 │       ├── Layout.jsx
 │       ├── Navbar.jsx
@@ -169,9 +173,7 @@ src/
 └── index.css
 ```
 
----
-
-## 🚀 Quick Start
+## �🚀 Quick Start
 
 ### Prerequisites
 
@@ -184,8 +186,8 @@ Before you begin, ensure you have the following installed:
 
 1️⃣ **Clone the repository**
 ```bash
-git clone https://github.com/yourusername/swasthya-sarathi-frontend.git
-cd swasthya-sarathi-frontend
+git clone https://github.com/nilesh-rahangdale/Swasthya-Sarathi
+cd Swasthya-Sarathi
 ```
 
 2️⃣ **Install dependencies**
@@ -212,8 +214,6 @@ VITE_API_BASE_ORDER=http://localhost:4000/api/v1/order
 # Payment Gateway
 VITE_RAZORPAY_KEY_ID=your_razorpay_key_id
 
-# Optional: Google Maps API (for advanced location features)
-VITE_GOOGLE_MAPS_API_KEY=your_google_maps_api_key
 ```
 
 4️⃣ **Start development server**
@@ -238,6 +238,75 @@ npm run preview
 # or
 yarn preview
 ```
+
+---
+
+## 🚀 Deployment
+
+### Deploying to Vercel
+
+1️⃣ **Install Vercel CLI** (if not already installed)
+```bash
+npm install -g vercel
+```
+
+2️⃣ **Login to Vercel**
+```bash
+vercel login
+```
+
+3️⃣ **Deploy**
+```bash
+vercel --prod
+```
+
+### Deploying to Netlify
+
+1️⃣ **Build the project**
+```bash
+npm run build
+```
+
+2️⃣ **Deploy dist folder**
+- Drag and drop the `dist` folder to Netlify
+- Or use Netlify CLI:
+```bash
+npm install -g netlify-cli
+netlify deploy --prod --dir=dist
+```
+
+### Environment Variables for Production
+Make sure to set all environment variables in your hosting platform:
+- `VITE_API_BASE_*` - All API endpoints
+- `VITE_RAZORPAY_KEY_ID` - Razorpay key
+- `VITE_GOOGLE_MAPS_API_KEY` - Google Maps key (optional)
+
+---
+
+## 🎯 Key Technical Features
+
+### 🏗️ Architecture Highlights
+- **Redux Toolkit State Management** - Centralized state with async thunks for API calls
+- **Role-Based Routing** - Protected routes with automatic role validation
+- **Lazy Loading** - Code splitting for optimal performance
+- **Error Boundaries** - Graceful error handling with fallback UI
+- **Custom Hooks** - Reusable logic for location, cart, and authentication
+
+### 🎨 UI/UX Excellence
+- **Framer Motion Animations** - Entrance, exit, and hover animations
+- **Responsive Design** - Works seamlessly on desktop, tablet, and mobile
+- **Gradient Effects** - Modern multi-color gradients throughout
+- **Micro-interactions** - Button hover effects, scale animations
+- **Loading States** - Skeleton screens and animated loaders
+- **Toast Notifications** - Real-time feedback for user actions
+
+### 🔐 Security & Performance
+- **JWT Token Management** - Secure authentication with automatic refresh
+- **Input Validation** - Client-side form validation
+- **Protected API Routes** - Axios interceptors for token injection
+- **Optimized Bundles** - Vite's build optimization and tree shaking
+- **Image Lazy Loading** - On-demand image loading
+- **Debounced Search** - Optimized search performance
 
 ---
 
@@ -348,14 +417,16 @@ All API calls use Axios with:
 - **Button**: Multiple variants (primary, secondary, success, danger, outline, ghost)
 - **Input**: With icons, validation, error states
 - **Card**: Hover effects, multiple padding sizes
+- **ProductCard**: Modern e-commerce style with gradient effects, animations
 - **Loader**: Full screen or inline
 - **Layout**: Navbar + Footer wrapper
 
 ### Styling
 - **Tailwind CSS** for all styling
-- Custom color palette
-- Responsive design (desktop-first)
-- Mobile-friendly
+- Custom color palette with gradient effects
+- Responsive design (mobile-first)
+- Smooth transitions and animations
+- Modern glassmorphism effects
 
 ## 🏗️ Architecture & Best Practices
 
@@ -373,14 +444,18 @@ All API calls use Axios with:
 ✅ **Consistent Naming** - camelCase for functions, PascalCase for components  
 ✅ **Clean Architecture** - Separation of concerns  
 ✅ **Utility Functions** - DRY principle  
-✅ **TypeScript Ready** - Can be migrated to TypeScript  
+✅ **Component Documentation** - Clear prop types and usage  
+✅ **Modular Design** - Reusable and composable components  
+✅ **Git Workflow** - Feature branches and pull requests  
 
 ### Performance Optimization
-⚡ **Lazy Loading** - Route-based code splitting  
+⚡ **Lazy Loading** - Route-based code splitting with React.lazy  
 ⚡ **Memoization** - React.memo for expensive components  
-⚡ **Virtualization** - Large lists optimization  
-⚡ **Image Optimization** - Lazy loading images  
+⚡ **Debouncing** - Search input optimization  
+⚡ **Image Optimization** - Lazy loading with fallback icons  
 ⚡ **Bundle Optimization** - Tree shaking and minification  
+⚡ **Efficient Re-renders** - Proper dependency arrays in hooks  
+⚡ **Framer Motion** - Hardware-accelerated animations  
 
 ---
 
@@ -452,21 +527,28 @@ All API calls use Axios with:
 ## 🎨 UI/UX Highlights
 
 ### Design System
-- 🎨 **Modern Gradient Designs** - Beautiful gradient backgrounds
-- 📱 **Responsive Layout** - Mobile-first approach
-- 🌙 **Consistent Theme** - Unified color palette
-- ✨ **Smooth Animations** - CSS transitions and transforms
-- 🔔 **Toast Notifications** - User-friendly feedback
-- ⚡ **Loading States** - Skeleton loaders and spinners
-- 🎯 **Intuitive Navigation** - Clear user flows
+- 🎨 **Modern Gradient Designs** - Beautiful multi-color gradients (blue → indigo → purple)
+- 📱 **Responsive Layout** - Mobile-first approach with breakpoints
+- 🌙 **Consistent Theme** - Unified color palette across all modules
+- ✨ **Smooth Animations** - Framer Motion for entrance and hover effects
+- 🔔 **Toast Notifications** - User-friendly feedback with React Hot Toast
+- ⚡ **Loading States** - Skeleton loaders and animated spinners
+- 🎯 **Intuitive Navigation** - Clear user flows with breadcrumbs
+- 🎭 **Micro-interactions** - Hover effects, scale animations, color transitions
+- 💎 **Glassmorphism** - Modern frosted glass effects
+- 🌈 **Color-Coded Status** - Visual indicators for order states
 
 ### Component Library
-- **Button** - Multiple variants (primary, secondary, success, danger, outline, ghost)
-- **Input** - With icons, validation states, error messages
-- **Card** - Shadow effects, hover states, multiple sizes
-- **Modal** - Accessible overlays with backdrop
-- **Loader** - Full-screen and inline variants
-- **Badge** - Status indicators with color coding
+- **Button** - Multiple variants with gradient effects and hover animations
+- **Input** - With icons, validation states, floating labels
+- **Card** - Shadow effects, gradient borders, hover states
+- **ProductCard** - E-commerce style with image zoom, badges, quantity controls
+- **Modal** - Accessible overlays with backdrop blur
+- **Loader** - Full-screen and inline variants with animations
+- **Badge** - Status indicators with color coding and icons
+- **StatCard** - Dashboard metrics with gradient backgrounds
+- **Navbar** - Responsive with role-based menus
+- **Footer** - Multi-section with links and social media
 
 ---
 
@@ -489,44 +571,35 @@ Contributions are welcome! Please follow these steps:
 
 ---
 
-## 📄 License
-
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🙏 Acknowledgments
-
-- [Backend Repository](https://github.com/bairariyakhushal/Swasthya-Sarthi) - Node.js + Express + MongoDB backend
-- [React Documentation](https://react.dev/)
-- [Redux Toolkit](https://redux-toolkit.js.org/)
-- [Tailwind CSS](https://tailwindcss.com/)
-- [Vite](https://vitejs.dev/)
-- [Razorpay](https://razorpay.com/)
-- [React Icons](https://react-icons.github.io/react-icons/)
-
----
-
-## 📞 Support
-
-For support, questions, or feedback:
-
-- 📧 Email: support@swasthyasarathi.com
-- 🐛 Issues: [GitHub Issues](../../issues)
-- 💬 Discussions: [GitHub Discussions](../../discussions)
-
----
-
 ## 🗺️ Roadmap
 
+### Completed ✅
+- [x] Multi-role authentication system
+- [x] Location-based medicine search
+- [x] Payment gateway integration (Razorpay)
+- [x] Real-time order tracking
+- [x] Responsive design with modern UI
+- [x] Pharmacy-specific dashboards
+- [x] Inventory management with profit tracking
+- [x] Admin approval workflows
+- [x] Volunteer delivery system
+
+### In Progress 🚧
 - [ ] Add dark mode support
-- [ ] Implement PWA features
+- [ ] Implement PWA features (offline support, push notifications)
+- [ ] Enhanced search filters (category, manufacturer)
+
+### Future Enhancements 🚀
 - [ ] Add multilingual support (Hindi, regional languages)
 - [ ] Integrate video consultation with doctors
 - [ ] Add medicine reminder notifications
 - [ ] Implement chat support for customer service
-- [ ] Add advanced analytics dashboard
+- [ ] Add advanced analytics dashboard with charts
 - [ ] Integrate AI-based medicine recommendations
+- [ ] Add medicine alternatives suggestions
+- [ ] Implement subscription-based medicine delivery
+- [ ] Add health tracking and medication history
+- [ ] Integration with health insurance providers
 
 ---
 

@@ -126,7 +126,7 @@ const Checkout = () => {
         setUserLocation(freshLocation);
       } catch (error) {
         console.warn('Could not get fresh location, using existing:', error);
-        toast.warning('Using previously saved location');
+        toast.error('Using previously saved location');
       }
 
       // Create order for each pharmacy

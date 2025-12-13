@@ -5,7 +5,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
   const { isAuthenticated, user } = useSelector((state) => state.auth);
 
   if (!isAuthenticated) {
-    return <Navigate to="/login" replace />;
+    return <Navigate to="/" replace />;
   }
 
   if (!allowedRoles.includes(user?.accountType)) {
@@ -17,7 +17,7 @@ const RoleBasedRoute = ({ children, allowedRoles }) => {
       Admin: '/admin/dashboard',
     };
     
-    return <Navigate to={roleRoutes[user?.accountType] || '/login'} replace />;
+    return <Navigate to={roleRoutes[user?.accountType] || '/'} replace />;
   }
 
   return children;

@@ -158,7 +158,8 @@ const volunteerSlice = createSlice({
       .addCase(getProfile.fulfilled, (state, action) => {
         state.loading = false;
         state.profile = action.payload.volunteer;
-        state.isAvailable = action.payload.volunteer?.isAvailable || false;
+        // Sync isAvailable with backend profile data
+        state.isAvailable = action.payload.volunteer?.isAvailable ?? false;
       })
       .addCase(getProfile.rejected, (state, action) => {
         state.loading = false;
@@ -227,6 +228,9 @@ const volunteerSlice = createSlice({
         state.loading = false;
         const acceptedOrderId = action.payload.order?._id;
         state.availableOrders = state.availableOrders.filter(order => order.orderId !== acceptedOrderId);
+        // Don't update isAvailable status from acceptOrder response
+        // Volunteer should remain available after accepting an order
+        // isAvailable should only be controlled by toggleAvailability action
       })
       .addCase(acceptOrder.rejected, (state, action) => {
         state.loading = false;

@@ -416,7 +416,7 @@ const TrackOrder = () => {
                           </span>
                         </div>
                       )}
-                      {isCurrent && !step.timestamp && (
+                      {isCurrent && !step.timestamp && isCompleted && (
                         <div className="mt-2 inline-block">
                           <span className="text-xs px-3 py-1 bg-blue-500 text-white rounded-full font-bold animate-pulse">
                             ● In Progress

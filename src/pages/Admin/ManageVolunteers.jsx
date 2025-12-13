@@ -50,7 +50,7 @@ const ManageVolunteers = () => {
             {volunteer.profilePhoto ? (
               <img
                 src={volunteer.profilePhoto}
-                alt={volunteer.firstName}
+                alt={volunteer.user?.firstName}
                 className="w-12 h-12 rounded-full object-cover border-2 border-white"
               />
             ) : (
@@ -59,9 +59,9 @@ const ManageVolunteers = () => {
           </div>
           <div>
             <h3 className="text-lg font-bold text-gray-800">
-              {volunteer.firstName} {volunteer.lastName}
+              {volunteer.user?.firstName} {volunteer.user?.lastName}
             </h3>
-            <p className="text-sm text-gray-600">{volunteer.email}</p>
+            <p className="text-sm text-gray-600">{volunteer.user?.email}</p>
           </div>
         </div>
         {getStatusBadge(volunteer.approvalStatus)}
@@ -70,19 +70,21 @@ const ManageVolunteers = () => {
       <div className="space-y-3">
         {/* Contact & Age */}
         <div className="grid grid-cols-2 gap-3">
-          <div className="bg-white rounded-lg p-3 shadow-sm">
+          <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-1">
               <FaPhone className="text-green-500" />
               <p className="text-xs text-gray-500 font-medium">Contact</p>
             </div>
-            <p className="font-semibold text-gray-800">{volunteer.contactNumber}</p>
+            <p className="font-bold text-gray-900 text-base">
+              {volunteer.user?.contactNumber || 'N/A'}
+            </p>
           </div>
-          <div className="bg-white rounded-lg p-3 shadow-sm">
+          <div className="bg-white rounded-lg p-3 shadow-sm border border-gray-200">
             <div className="flex items-center gap-2 mb-1">
               <FaUserFriends className="text-green-500" />
               <p className="text-xs text-gray-500 font-medium">Age</p>
             </div>
-            <p className="font-semibold text-gray-800">{volunteer.age} years</p>
+            <p className="font-bold text-gray-900 text-base">{volunteer.age} years</p>
           </div>
         </div>
 
