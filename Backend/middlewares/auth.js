@@ -1,0 +1,154 @@
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
+const User = require("../models/user");
+
+// Auth middleware
+exports.auth = async (req, res, next) => {
+    try {
+        // Extracting JWT from Authorization header only (most reliable in production)
+        const authHeader = req.header("Authorization");
+        const token = authHeader ? authHeader.replace("Bearer ", "") : null;
+
+        // If JWT is missing, return 401 Unauthorized response
+        if (!token) {
+            console.log("❌ Token missing");
+            return res.status(401).json({ 
+                success: false, 
+                message: `Token Missing` 
+            });
+        }
+
+        try {
+            // Verifying the JWT using the secret key stored in environment variables
+            const decode = jwt.verify(token, process.env.JWT_SECRET);
+            console.log("✅ Token verified:", decode);
+            // Storing the decoded JWT payload in the request object for further use
+            req.user = decode;
+        } catch (error) {
+            // If JWT verification fails, return 401 Unauthorized response
+            console.log("❌ Token verification failed:", error.message);
+            return res.status(401).json({ 
+                success: false, 
+                message: "token is invalid",
+                error: error.message 
+            });
+        }
+
+        // If JWT is valid, move on to the next middleware or request handler
+        next();
+    } catch (error) {
+        // If there is an error during the authentication process, return 401 Unauthorized response
+        console.log("❌ Auth middleware error:", error);
+        return res.status(401).json({
+            success: false,
+            message: `Something Went Wrong While Validating the Token`,
+            error: error.message
+        });
+    }
+};
+
+// Admin authorization middleware
+exports.isAdmin = async (req, res, next) => {
+    try {
+        const user = await User.findById(req.user.id);
+        
+        if (!user || user.accountType !== 'Admin') {
+            return res.status(403).json({
+                success: false,
+                message: "Access denied. Admin privileges required."
+            });
+        }
+        
+        next();
+    } catch (error) {
+        return res.status(500).json({
+            success: false,
+            message: "Error checking admin privileges",
+            error: error.message
+        });
+    }
+};
+
+// Middleware for checking if user is Vendor
+exports.isVendor = async (req, res, next) => {
+    try {
+        const userDetails = await User.findOne({ email : req.user.email });
+
+        if (userDetails.accountType !== "Vendor") {
+            return res.status(401).json({
+                success: false,
+                message: "This is a Protected Route for Vendor",
+            });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: `User Role Can't be Verified` 
+        });
+    }
+};
+
+// Middleware for checking if user is Customer
+exports.isCustomer = async (req, res, next) => {
+    try {
+        console.log("👤 Checking customer role for:", req.user);
+        
+        if (!req.user || !req.user.email) {
+            console.log("❌ User not found in request");
+            return res.status(401).json({
+                success: false,
+                message: "User authentication failed",
+            });
+        }
+
+        const userDetails = await User.findOne({ email: req.user.email });
+        
+        if (!userDetails) {
+            console.log("❌ User not found in database:", req.user.email);
+            return res.status(404).json({
+                success: false,
+                message: "User not found",
+            });
+        }
+
+        console.log("✅ User found:", userDetails.email, "Type:", userDetails.accountType);
+
+        if (userDetails.accountType !== "Customer") {
+            console.log("❌ Not a customer:", userDetails.accountType);
+            return res.status(403).json({
+                success: false,
+                message: "This is a Protected Route for Customer",
+            });
+        }
+        
+        next();
+    } catch (error) {
+        console.log("❌ isCustomer error:", error);
+        return res.status(500).json({ 
+            success: false, 
+            message: `User Role Can't be Verified`,
+            error: error.message 
+        });
+    }
+};
+
+// Middleware for checking if user is Volunteer
+exports.isVolunteer = async (req, res, next) => {
+    try {
+        const userDetails = await User.findOne({ email: req.user.email });
+
+        if (userDetails.accountType !== "Volunteer") {
+            return res.status(401).json({
+                success: false,
+                message: "This is a Protected Route for Volunteer",
+            });
+        }
+        next();
+    } catch (error) {
+        return res.status(500).json({ 
+            success: false, 
+            message: `User Role Can't be Verified` 
+        });
+    }
+};
