@@ -13,7 +13,7 @@ export const authApi = {
     const isFormData = userData instanceof FormData;
     
     // Log signup data
-    console.log('📤 Signup Data Being Sent to Backend:');
+    console.log(' Signup Data Being Sent to Backend:');
     console.log('Is FormData:', isFormData);
     
     if (isFormData) {
@@ -35,7 +35,7 @@ export const authApi = {
       } : undefined,
     });
     
-    console.log('✅ Signup Response:', response.data);
+    console.log(' Signup Response:', response.data);
     return response.data;
   },
 

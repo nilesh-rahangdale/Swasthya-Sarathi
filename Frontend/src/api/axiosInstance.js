@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const axiosInstance = axios.create({
-  baseURL: import.meta.env.VITE_API_BASE_URL || 'http://localhost:4000/api/v1',
+  baseURL: import.meta.env.VITE_API_BASE_URL ,
   timeout: 100000,
   headers: {
     'Content-Type': 'application/json',
@@ -27,10 +27,9 @@ axiosInstance.interceptors.request.use(
       // Set token as cookie
       document.cookie = `token=${token}; path=/; SameSite=Lax`;
       
-      console.log('📤 API Request:', config.method?.toUpperCase(), config.url);
-      console.log('   Token in cookie and header');
+
     } else {
-      console.warn('⚠️ API Request without token:', config.method?.toUpperCase(), config.url);
+      console.warn(' API Request without token:', config.method?.toUpperCase(), config.url);
     }
     return config;
   },
@@ -80,12 +79,12 @@ axiosInstance.interceptors.response.use(
         
         // Don't logout for backend validation errors - these are temporary backend issues
         if (errorLower.includes('validating') || errorLower.includes('went wrong')) {
-          console.error('⚠️ Backend validation error - NOT logging out (backend issue)');
+          console.error(' Backend validation error - NOT logging out (backend issue)');
           return Promise.reject(error);
         }
         
         if (isRealAuthError) {
-          console.error('⚠️ Auth error detected - initiating logout');
+          console.error(' Auth error detected - initiating logout');
           
           // Clear storage and cookie
           localStorage.removeItem('token');
@@ -104,7 +103,7 @@ axiosInstance.interceptors.response.use(
             }, 100);
           }
         } else {
-          console.warn('⚠️ 401 but not auth-related error - NOT logging out');
+          console.warn(' 401 but not auth-related error - NOT logging out');
         }
       }
       

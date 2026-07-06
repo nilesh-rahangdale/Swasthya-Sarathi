@@ -37,33 +37,27 @@ export const login = createAsyncThunk(
     try {
       const response = await authApi.login(credentials);
       
-      console.log('🔐 Login response received:', {
-        hasToken: !!response.token,
-        hasUser: !!response.user,
-        userType: response.user?.accountType,
-        tokenPreview: response.token ? response.token.substring(0, 30) + '...' : 'none'
-      });
       
       // Store token and user data
       if (response.token) {
         localStorage.setItem('token', response.token);
         // Also set token as cookie for backend authentication
         document.cookie = `token=${response.token}; path=/; SameSite=Lax; max-age=86400`;
-        console.log('✅ Token stored in localStorage and cookie');
+        console.log(' Token stored in localStorage and cookie');
       } else {
-        console.error('❌ No token in response!');
+        console.error(' No token in response!');
       }
       if (response.user) {
         localStorage.setItem('user', JSON.stringify(response.user));
-        console.log('✅ User stored in localStorage');
+        console.log(' User stored in localStorage');
       } else {
-        console.error('❌ No user in response!');
+        console.error(' No user in response!');
       }
       
       toast.success(response.message || 'Login successful!');
       return response;
     } catch (error) {
-      console.error('❌ Login failed:', error.message);
+      console.error(' Login failed:', error.message);
       toast.error(error.message);
       return rejectWithValue(error.message);
     }
@@ -103,7 +97,7 @@ const authSlice = createSlice({
       const token = localStorage.getItem('token');
       const user = localStorage.getItem('user');
       
-      console.log('🔄 Initializing auth state');
+      console.log(' Initializing auth state');
       console.log('   Token in localStorage:', !!token);
       console.log('   User in localStorage:', !!user);
       
@@ -115,10 +109,10 @@ const authSlice = createSlice({
           state.isAuthenticated = true;
           // Set cookie if token exists in localStorage
           document.cookie = `token=${token}; path=/; SameSite=Lax; max-age=86400`;
-          console.log('✅ Auth initialized - User:', parsedUser.accountType);
+          console.log(' Auth initialized - User:', parsedUser.accountType);
         } catch (error) {
           // If parsing fails, clear everything
-          console.error('❌ Failed to parse user data:', error);
+          console.error(' Failed to parse user data:', error);
           state.user = null;
           state.token = null;
           state.isAuthenticated = false;
@@ -127,7 +121,7 @@ const authSlice = createSlice({
         }
       } else {
         // Clear state if no valid token/user
-        console.log('⚠️ No valid token/user found');
+        console.log(' No valid token/user found');
         state.user = null;
         state.token = null;
         state.isAuthenticated = false;
